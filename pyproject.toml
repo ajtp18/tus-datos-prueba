@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "tus-datos-prueba"
+version = "0.1.0"
+description = ""
+authors = ["Armando Tinoco <atinoco@jwprojecthouse.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+fastapi = {extras = ["standard"], version = "^0.115.6"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
+psycopg = "^3.2.3"
+python-slugify = "^8.0.4"
+bcrypt = "^4.2.1"
+strawberry-graphql = {extras = ["fastapi"], version = "^0.253.1"}
+psycopg-binary = "^3.2.3"
+alembic = "^1.14.0"
+python-dotenv = "^1.0.1"
+pyjwt = "^2.10.1"
+
+[tool.poetry.scripts]
+dev = "commands:dev"
+alembic-migrate = "commands:alembic_migrate"
+alembic-autogen = "commands:alembic_autogen"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
