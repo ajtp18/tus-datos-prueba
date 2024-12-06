@@ -1,7 +1,7 @@
 from tus_datos_prueba.utils.db import Session
 from tus_datos_prueba.models import User, Role, UserPassword
 from sqlalchemy.orm import joinedload
-from sqlalchemy import select
+from sqlalchemy import select, update, insert
 from tus_datos_prueba.utils.password import verify_password, create_password
 from uuid import UUID
 
@@ -35,3 +35,28 @@ class UserService:
         user = await self.session.scalar(select(User.id).where(User.email == email).limit(1))
         
         return user
+
+    async def get_by_id(self, id: UUID) -> User | None:
+        user = await self.session.scalar(select(User).where(User.id == id).limit(1))
+        
+        return user
+    
+    async def list_users(self, limit: int | None = None, offset: int | None = None) -> list[User]:
+        query = select(User)
+        
+        if offset is not None:
+            query = query.offset(offset)
+
+        if limit is not None:
+            query = query.limit(limit)
+
+        users = list(await self.session.scalars(query))
+        return users
+    
+    async def update(self, user: User):
+        await self.session.flush()
+        await self.session.commit()
+
+    async def delete(self, user: User):
+        await self.session.delete(user)
+        await self.session.commit()
