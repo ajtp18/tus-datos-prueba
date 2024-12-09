@@ -32,7 +32,7 @@ class UserService:
                 await self.session.commit()
 
     async def get_id_by_email(self, email: str) -> UUID | None:
-        user = await self.session.scalar(select(User.id).where(User.email == email & User.active == True).limit(1))
+        user = await self.session.scalar(select(User.id).where((User.email == email) & (User.active == True)).limit(1))
         
         return user
 
