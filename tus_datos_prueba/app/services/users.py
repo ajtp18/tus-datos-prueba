@@ -32,17 +32,17 @@ class UserService:
                 await self.session.commit()
 
     async def get_id_by_email(self, email: str) -> UUID | None:
-        user = await self.session.scalar(select(User.id).where(User.email == email).limit(1))
+        user = await self.session.scalar(select(User.id).where(User.email == email & User.active == True).limit(1))
         
         return user
 
     async def get_by_id(self, id: UUID) -> User | None:
-        user = await self.session.scalar(select(User).where(User.id == id).limit(1))
+        user = await self.session.scalar(select(User).where(User.id == id & User.active == True).limit(1))
         
         return user
     
     async def list_users(self, limit: int | None = None, offset: int | None = None) -> list[User]:
-        query = select(User)
+        query = select(User).where(User.active == True)
         
         if offset is not None:
             query = query.offset(offset)
@@ -58,5 +58,6 @@ class UserService:
         await self.session.commit()
 
     async def delete(self, user: User):
-        await self.session.delete(user)
+        user.active = False
+        await self.session.flush()
         await self.session.commit()

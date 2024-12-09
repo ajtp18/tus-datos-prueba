@@ -8,8 +8,9 @@ from uuid import UUID
 class AssistantResponse:
     id: UUID
     event_id: UUID
-    user_id: UUID
-    status: int
+    user_id: UUID | None
+    full_name: str | None
+    email: str | None
     metadata: JSON
     contact_metadata: JSON
 
@@ -18,8 +19,9 @@ class AssistantResponse:
         return AssistantResponse(
             id=assistant.id,
             event_id=assistant.event_id,
+            email=assistant.email,
+            full_name=assistant.full_name,
             user_id=assistant.user_id,
-            status=assistant.status,
             metadata=assistant.meta,
             contact_metadata=assistant.contact_meta
         )

@@ -68,26 +68,32 @@ services:
       PGADMIN_DEFAULT_PASSWORD: password
 
 
-  # logstash:
-  #   image: docker.elastic.co/logstash/logstash:8.12.2
-  #   container_name: dev-logstash
-  #   environment:
-  #     - xpack.monitoring.enabled=false
-  #     - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
-  #   volumes:
-  #     - ./logstash/pipeline:/usr/share/logstash/pipeline
-  #     - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-  #   ports:
-  #     - "${LOGSTASH_PORT}:5044"
-  #   depends_on:
-  #     - elasticsearch
-  #     - postgresql
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "bin/logstash", "-t"]
-  #     interval: 60s
-  #     timeout: 30s
-  #     retries: 5
+  logstash:
+    build: ./services/logstash
+    volumes:
+      - ./logstash:/usr/share/logstash/pipeline
+    depends_on:
+      - elasticsearch
+      - postgresql
+    environment:
+      xpack.monitoring.enabled: 'false'
+      LS_JAVA_OPTS: '-Xms256m -Xmx256m'
+      DB_USER: ${POSTGRES_USER}
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bin/logstash", "-t"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+
+  mailhog:
+    image: docker.io/mailhog/mailhog
+    restart: unless-stopped
+    ports:
+      - 1025:1025
+      - 7025:8025
 
 volumes:
   postgres-data:

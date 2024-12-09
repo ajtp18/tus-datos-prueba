@@ -18,6 +18,8 @@ psycopg-binary = "^3.2.3"
 alembic = "^1.14.0"
 python-dotenv = "^1.0.1"
 pyjwt = "^2.10.1"
+elasticsearch = {extras = ["async"], version = "^8.16.0"}
+aiosmtplib = "^3.0.2"
 
 [tool.poetry.scripts]
 dev = "commands:dev"

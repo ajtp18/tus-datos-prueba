@@ -49,7 +49,6 @@ class Event(UseCreatedAt, ModelBase):
 
     assistants: Mapped[list["Assistant"]] = relationship(back_populates="event", cascade="all, delete-orphan")
 
-
 class AssistantType(IntEnum):
     """
     Assistant Type
