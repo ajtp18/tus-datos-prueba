@@ -20,11 +20,16 @@ python-dotenv = "^1.0.1"
 pyjwt = "^2.10.1"
 elasticsearch = {extras = ["async"], version = "^8.16.0"}
 aiosmtplib = "^3.0.2"
+pytest = "^8.3.4"
 
 [tool.poetry.scripts]
 dev = "commands:dev"
 alembic-migrate = "commands:alembic_migrate"
 alembic-autogen = "commands:alembic_autogen"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]

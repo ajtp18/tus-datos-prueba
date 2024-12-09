@@ -63,9 +63,7 @@ class SessionMutations:
         # Parse dates
         sd = datetime.fromisoformat(start_date).replace(tzinfo=event.start_date.tzinfo)
         ed = datetime.fromisoformat(end_date).replace(tzinfo=event.end_date.tzinfo)
-
-        print(event.start_date, event.end_date, "x" * 100)
-
+        
         # Validate session date range within the event
         assert sd >= event.start_date and ed <= event.end_date, "Session must be within the event date range."
 

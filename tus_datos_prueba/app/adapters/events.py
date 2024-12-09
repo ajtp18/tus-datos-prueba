@@ -87,10 +87,10 @@ class EventMutations:
         meta: JSON, 
         assitant_limit: int
     ) -> str:
-        has_permission(info.context["session"], "user", "create")
+        has_permission(info.context["session"], "events", "create")
 
         # Title not empty
-        assert title.stript(), "Title is required"
+        assert title.strip(), "Title is required"
 
         # Description not to long
         assert len(description.split()) <= 500, "Description is too long"
@@ -106,7 +106,7 @@ class EventMutations:
         svc: EventService = info.context["event_service"]
 
         # events cannot overlap their dates
-        assert not await svc.events_conflict(start, end), "Events cannot overlap their dates"
+        assert await svc.events_conflict(start, end), "Events cannot overlap their dates"
 
         await svc.create_event(
             title, 
@@ -133,7 +133,7 @@ class EventMutations:
         assitant_limit: int | None = None,
         status: int | None = None
     ) -> None:
-        has_permission(info.context["session"], "user", "update")
+        has_permission(info.context["session"], "events", "update")
 
         svc: EventService = info.context["event_service"]
         event = await svc.get_by_id(id)
@@ -196,7 +196,7 @@ class EventMutations:
 
     @mutation
     async def event_delete(self, info: Info, id: UUID) -> None:
-        has_permission(info.context["session"], "user", "delete")
+        has_permission(info.context["session"], "events", "delete")
 
         svc: EventService = info.context["event_service"]
         event = await svc.get_by_id(id)
