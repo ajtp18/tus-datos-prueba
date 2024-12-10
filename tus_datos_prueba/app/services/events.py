@@ -2,7 +2,7 @@ from sqlalchemy import select, func
 from tus_datos_prueba.models.events import Assistant
 from tus_datos_prueba.utils.db import Session
 from tus_datos_prueba.utils.elastic import Elastic
-from tus_datos_prueba.models import Event
+from tus_datos_prueba.models import Event, User
 from datetime import datetime
 from uuid import UUID
 
@@ -30,14 +30,13 @@ class EventService:
         event.created_by_id = created_by_id
         event.updated_at = datetime.utcnow()
 
-        async with self.session.begin():
-            try:
-                self.session.add(event)
-            except:
-                await self.session.rollback()
-                raise
-            else:
-                await self.session.commit()
+        try:
+            self.session.add(event)
+        except:
+            await self.session.rollback()
+            raise
+        else:
+            await self.session.commit()
 
         await self.session.refresh(event)
 
@@ -46,6 +45,10 @@ class EventService:
     async def get_by_id(self, id: UUID) -> Event | None:
         query = select(Event).where(Event.id == id, Event.active == True).limit(1)
 
+        return await self.session.scalar(query)
+    
+    async def get_email_by_id(self, id: UUID) -> str:
+        query = select(User.email).join(Event, Event.created_by_id == User.id).where(Event.id == id).limit(1)
         return await self.session.scalar(query)
     
     async def list_events(self, limit: int | None = None, offset: int | None = None) -> list[Event]:
@@ -78,14 +81,22 @@ class EventService:
         return current_count_assistant > event.assitant_limit
     
     async def events_conflict(self, start_date: datetime, end_date: datetime) -> bool:
-        query = select(func.count(Event)).where(
-            (Event.start_date <= start_date) & (Event.end_date >= start_date) |
-            (Event.start_date <= end_date) & (Event.end_date >= end_date)
+        query = select(func.count(Event.id)).where(
+            (Event.start_date < end_date) & (Event.end_date > start_date)
         )
 
-        events_conflicted = await self.session.scalars(query)
-
-        return events_conflicted > 0
+        count = await self.session.scalar(query) or 0 
+        return count > 0
+    
+    async def get_event_title(self, event_id: UUID) -> str:
+        event = await self.session.scalar(select(Event.title).where(Event.id == event_id))
+        if not event:
+            raise ValueError("Event not found")
+        return event
+    
+    async def get_event_creator_email(self, event_id: UUID) -> str:
+        event = await self.get_by_id(event_id)
+        return event.created_by.email
 
 
 SearchProps = dict[str, str | tuple[str, str]]

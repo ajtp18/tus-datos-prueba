@@ -6,8 +6,11 @@ from strawberry.scalars import JSON
 from tus_datos_prueba.utils.jwt import has_permission
 
 from tus_datos_prueba.app.services.events import EventService
+from tus_datos_prueba.app.services.users import UserService
 from tus_datos_prueba.app.services.sessions import SessionService
 from tus_datos_prueba.app.services.assistants import AssistantService
+from tus_datos_prueba.utils.mail.compose import compose_email
+from tus_datos_prueba.utils.mail import Mail
 
 from tus_datos_prueba.models.events import EventStatus, AssistantType
 from tus_datos_prueba.app.models.sessions import SessionResponse
@@ -49,6 +52,7 @@ class SessionMutations:
         has_permission(info.context["session"], "assistants", "create")
         
         event_svc: EventService = info.context["event_service"]
+        svc_users: UserService = info.context["user_service"]
         assistant_svc: AssistantService = info.context["assistant_service"]
         session_svc: SessionService = info.context["session_service"]
 
@@ -76,6 +80,8 @@ class SessionMutations:
         conflict = await session_svc.sessions_conflict(event_id, sd, ed)
         assert not conflict, "Sessions cannot overlap."
 
+        user = UUID(info.context["session"]["sub"])
+
         # Create session after all validations
         await session_svc.create_session(
             event_id=event_id,
@@ -86,6 +92,18 @@ class SessionMutations:
             meta=meta,
             speaker_id=speaker_id
         )
+        
+
+        # Send email to the creator
+
+        user_email = (await svc_users.get_by_id(user)).email
+
+        message = compose_email(
+            "Session Created Successfully",
+            user_email,
+            f"A new session titled '{title}' has been created for your event '{event.title}'."
+        )
+        await Mail.send_message(message)
 
         return "Session created successfully."
 
@@ -171,8 +189,11 @@ class SessionMutations:
     @mutation
     async def session_delete(self, info: Info, id: UUID) -> None:
         has_permission(info.context["session"], "assistants", "delete")
-        
+
         session_svc: SessionService = info.context["session_service"]
+        assistant_svc: AssistantService = info.context["assistant_service"]
+        mail: Mail = info.context["mail"]
+
         session_obj = await session_svc.get_by_id(id)
         assert session_obj is not None, "Session does not exist or is inactive."
 
@@ -180,5 +201,17 @@ class SessionMutations:
         assert event.active, "Cannot delete sessions of an inactive event."
         assert event.status != EventStatus.FINISHED, "Cannot delete sessions of a finished event."
 
+        # Obtener los asistentes del evento
+        assistants = await assistant_svc.get_assistants_by_event_id(event.id)
+
+        # Notificar a todos los asistentes
+        for assistant in assistants:
+            message = compose_email(
+                "Session Deleted",
+                assistant.email,
+                f"The session '{session_obj.title}' for the event '{event.title}' has been deleted."
+            )
+            await mail.send_message(message)
+
+        # Eliminar la sesión
         await session_svc.delete_session(session_obj)
-        return "Session deleted successfully."

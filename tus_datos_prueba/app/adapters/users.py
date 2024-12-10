@@ -3,6 +3,8 @@ from tus_datos_prueba.utils.db import Session
 from tus_datos_prueba.app.services.users import UserService
 from tus_datos_prueba.app.services.roles import RoleService
 from tus_datos_prueba.app.models.users import UserResponse
+from tus_datos_prueba.utils.mail import Mail
+from tus_datos_prueba.utils.mail.compose import compose_email
 from tus_datos_prueba.utils.jwt import has_permission
 from tus_datos_prueba.config import ADMIN_DOMAIN
 from strawberry import type, mutation, field, Info
@@ -77,6 +79,14 @@ class UserMutations:
         user = await svc.get_id_by_email(email)
         assert user is not None
 
+        mail: Mail = info.context["mail"]
+        message = compose_email(
+            "Welcome to the Service",
+            email,
+            f"Welcome {metadata['full_name']}, your user was created."
+        )
+        await mail.send_message(message)
+
         return str(user)
     
     @mutation
@@ -122,6 +132,38 @@ class UserMutations:
         user = await svc.get_by_id(id)
         assert user is not None
 
+        mail: Mail = info.context["mail"]
+        message = compose_email(
+            "Warning!! User was Deleted!",
+            user.email,
+            f"Your user has been deleted."
+        )
+
+        await mail.send_message(message)        
+
         await svc.delete(user)
+
+    @mutation
+    async def user_change_password(self, info: Info, password : str) -> None:
+        has_permission(info.context["session"], "user", "update")
+
+        svc: UserService = info.context["user_service"]
+        user = await svc.get_id(UUID(info.context["session"]["sub"]))
+
+        print(user)
+        assert user is not None
+
+        validate_password(password)
+
+        mail: Mail = info.context["mail"]
+        message = compose_email(
+            "Warning!! Password was Changed!",
+            user.email,
+            f"Your password has been changed."
+        )
+
+        await mail.send_message(message)
+
+        await svc.change_password(user, password)
 
 

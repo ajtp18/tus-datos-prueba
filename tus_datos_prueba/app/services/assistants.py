@@ -83,3 +83,7 @@ class AssistantService:
     async def delete(self, assistant: Assistant) -> None:
         await self.session.delete(assistant)
         await self.session.commit()
+
+    async def get_assistants_by_event_id(self, event_id: UUID) -> list[Assistant]:
+        assistants = await self.session.scalars(select(Assistant).where(Assistant.event_id == event_id))
+        return assistants

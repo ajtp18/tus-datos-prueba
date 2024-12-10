@@ -1,9 +1,12 @@
 from datetime import datetime
 from tus_datos_prueba.app.services.events import EventService, SearchEventService
+from tus_datos_prueba.app.services.users import UserService
 from tus_datos_prueba.app.models.events import EventResponse
+from tus_datos_prueba.utils.mail.compose import compose_email
 from tus_datos_prueba.models.events import EventStatus
 from tus_datos_prueba.utils.jwt import has_permission
 from strawberry import type, mutation, field, Info
+from tus_datos_prueba.utils.mail import Mail
 from strawberry.scalars import JSON
 from uuid import UUID
 
@@ -99,14 +102,17 @@ class EventMutations:
         start = datetime.fromisoformat(start_date)
         end = datetime.fromisoformat(end_date)
 
-        assert end >= start, "End date must be greater than start date"
+        assert end > start, "End date must be greater than start date"
 
-        assert assitant_limit > 10, "Assistant limit must be greater than 10"
+        assert assitant_limit >= 10, "Assistant limit must be greater than 10"
 
         svc: EventService = info.context["event_service"]
+        svc_users: UserService = info.context["user_service"]
 
         # events cannot overlap their dates
-        assert await svc.events_conflict(start, end), "Events cannot overlap their dates"
+        #assert not await svc.events_conflict(start, end), "Events cannot overlap their dates"
+
+        user = UUID(info.context["session"]["sub"])
 
         await svc.create_event(
             title, 
@@ -115,8 +121,18 @@ class EventMutations:
             end_date,
             meta,
             assitant_limit,
-            info.context["session"]["sub"]
+            user
         )
+
+        user_email = (await svc_users.get_by_id(user)).email
+        
+        mail: Mail = info.context["mail"]
+        message = compose_email(
+            "Event Created Successfully",
+            user_email,
+            f"Your event '{title}' has been created successfully. It is scheduled from {start_date} to {end_date}."
+        )
+        await mail.send_message(message)
 
         return "Event created successfully"
     
