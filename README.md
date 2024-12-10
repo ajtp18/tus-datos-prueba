@@ -171,6 +171,8 @@ Para iniciar los servicios:
 docker-compose up
 ```
 
+Para mas informacion de cada uno de los endpoint, visite API.md en la raiz del proyecto
+
 ## Licencia
 
 [MIT License](LICENSE)
