@@ -437,6 +437,6 @@ mutation {
 
 Para más información, visita los endpoints adicionales:
 
-- **Swagger**: `/docs`
+- **Graphql**: `/graphql`
 - **Prometheus Metrics**: `/metrics`
 
