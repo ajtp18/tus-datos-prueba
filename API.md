@@ -102,38 +102,6 @@ mutation {
 
 **Requisitos:**
 - **id**: Identificador único del usuario.
-Esta mutación crea un nuevo usuario en la aplicación.
-
-```graphql
-mutation {
-    userCreate(
-        email: "",
-        password: "",
-        role: "",
-        metadata: {
-            full_name: "",
-            job: ""
-        }
-    )
-}
-```
-
-**Requisitos:**
-- **email**: Debe coincidir con el dominio configurado para roles de administrador.
-- **password**: Al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.
-- **role**: Rol del usuario basado en los slugs disponibles (`user`, `administrator`, etc.).
-- **metadata**:
-  - **full_name**: Nombre completo del usuario.
-  - **job**: Cargo o función del usuario.
-
-**Respuesta esperada:**
-```json
-{
-    "data": {
-        "userCreate": "<uuid del usuario creado>"
-    }
-}
-```
 
 #### Consultar Usuarios
 Obtiene una lista de usuarios registrados.
@@ -158,17 +126,6 @@ query {
 - **limit** (opcional): Número máximo de usuarios a devolver.
 - **offset** (opcional): Desplazamiento para paginación.
 
-#### Eliminar Usuario
-Elimina un usuario existente.
-
-```graphql
-mutation {
-    userDelete(id: "<uuid del usuario>")
-}
-```
-
-**Requisitos:**
-- **id**: Identificador único del usuario.
 
 ### Asistentes
 #### Crear Asistente
@@ -239,33 +196,6 @@ mutation {
 
 **Requisitos:**
 - **id**: Identificador único del asistente.
-Registra un nuevo asistente en un evento.
-
-```graphql
-mutation {
-    assistantCreate(
-        event_id: "<uuid del evento>",
-        email: "",
-        full_name: "",
-        type: 1,
-        metadata: {
-            theme: ""
-        },
-        contact_metadata: {
-            phone: ""
-        }
-    )
-}
-```
-
-**Requisitos:**
-- **event_id**: Identificador único del evento.
-- **email**: Correo electrónico del asistente.
-- **full_name**: Nombre completo del asistente.
-- **type**: Tipo de asistente (`1` para ponentes, etc.).
-- **metadata**: Información adicional (requerido para ponentes).
-- **contact_metadata**:
-  - **phone**: Número de teléfono (obligatorio).
 
 ### Eventos
 #### Crear Evento
@@ -328,26 +258,6 @@ mutation {
 
 **Requisitos:**
 - **id**: Identificador único del evento.
-Esta mutación permite crear un nuevo evento.
-
-```graphql
-mutation {
-    eventCreate(
-        title: "",
-        description: "",
-        start_date: "",
-        end_date: "",
-        meta: {},
-        assitant_limit: 20
-    )
-}
-```
-
-**Requisitos:**
-- **title**: Título del evento.
-- **description**: Descripción (máximo 500 palabras).
-- **start_date** y **end_date**: Fechas en formato ISO (el fin debe ser mayor al inicio).
-- **assitant_limit**: Mínimo 10 asistentes permitidos.
 
 ### Sesiones
 #### Crear Sesión
@@ -410,28 +320,6 @@ mutation {
 
 **Requisitos:**
 - **id**: Identificador único de la sesión.
-Permite crear una sesión dentro de un evento.
-
-```graphql
-mutation {
-    sessionCreate(
-        event_id: "<uuid del evento>",
-        title: "",
-        description: "",
-        start_date: "",
-        end_date: "",
-        meta: {},
-        speaker_id: "<uuid del ponente>"
-    )
-}
-```
-
-**Requisitos:**
-- **event_id**: Identificador del evento.
-- **title**: Título de la sesión.
-- **description**: Descripción (máximo 500 palabras).
-- **start_date** y **end_date**: Fechas en formato ISO dentro del rango del evento.
-- **speaker_id**: Identificador único del ponente (debe ser tipo `SPEAKER`).
 
 ### Consultar Documentación
 
