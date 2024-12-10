@@ -15,6 +15,7 @@ from tus_datos_prueba.app.services.users import UserService
 from tus_datos_prueba.utils.db import Session
 from tus_datos_prueba.utils.elastic import Elastic
 from tus_datos_prueba.utils.jwt.auth import UserSession
+from tus_datos_prueba.utils.mail import Mail
 
 
 @type
@@ -29,9 +30,10 @@ class Mutations(UserMutations, EventMutations, AssistantMutations, SessionMutati
     pass
 
 
-async def get_context(user: UserSession, elastic: Elastic, session: Session):
+async def get_context(user: UserSession, elastic: Elastic, mail: Mail, session: Session):
     return {
         "session": user,
+        "mail": mail,
         "user_service": UserService(session),
         "event_service": EventService(session),
         "search_event_service": SearchEventService(elastic),

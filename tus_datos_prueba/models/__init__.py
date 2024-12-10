@@ -9,6 +9,7 @@ __all__ = [
     "User",
     "Event",
     "Assistant",
+    "Session",
     "METADATA"
 ]
 
