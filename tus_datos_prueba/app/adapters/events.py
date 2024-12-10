@@ -110,7 +110,7 @@ class EventMutations:
         svc_users: UserService = info.context["user_service"]
 
         # events cannot overlap their dates
-        #assert not await svc.events_conflict(start, end), "Events cannot overlap their dates"
+        assert not await svc.events_conflict(start, end), "Events cannot overlap their dates"
 
         user = UUID(info.context["session"]["sub"])
 

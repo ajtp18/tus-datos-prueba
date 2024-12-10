@@ -21,5 +21,5 @@ ELASTIC_HOSTS = env.get("ELASTIC_HOSTS", "http://localhost:9200").split(";")
 MAIL_HOST = env.get("MAIL_HOST", "localhost:1025")
 MAIL_USER = env.get("MAIL_USER")
 MAIL_PASSWORD = env.get("MAIL_PASSWORD")
-MAIL_FROM = env.get("MAIL_FROM", "prueba@localhost <Prueba Tus Datos>")
+MAIL_FROM = env.get("MAIL_FROM", "Prueba Tus Datos <prueba@localhost>")
 MAIL_TLS = env.get("MAIL_TLS", "false") in ["true", "yes"]
