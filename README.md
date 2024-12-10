@@ -110,8 +110,8 @@ Incluye pruebas unitarias para todas las capas del sistema:
 1. Clonar el repositorio:
 
    ```bash
-   git clone <url-del-repositorio>
-   cd <nombre-del-repositorio>
+   git clone [<url-del-repositorio>](https://github.com/ajtp18/tus-datos-prueba.git)
+   cd tus_datos_prueba
    ```
 
 2. Instalar dependencias:
