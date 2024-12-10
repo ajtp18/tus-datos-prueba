@@ -123,17 +123,32 @@ Incluye pruebas unitarias para todas las capas del sistema:
 3. Configurar variables de entorno:
 
    - Crear un archivo `.env` basado en el ejemplo proporcionado.
+   - ejemplo:
+   - POSTGRES_DB=tusdatos
+   - POSTGRES_USER=tusdatos
+   - POSTGRES_PASSWORD=tusdatos
+   - POSTGRES_HOST=localhost:5432
+   - ADMIN_DOMAIN=eventos.com
+   - DEBUG=yes
+   - COMPOSE_PROJECT_NAME=tusdatos
+   - ENABLE_METRICS=true
 
 4. Ejecutar migraciones:
 
    ```bash
-   poetry run python commands.py alembic_migrate
+   poetry run python commands.py alembic_migrate | alembic upgrade head
    ```
 
-5. Iniciar el servidor:
-
+5. Iniciar el servidor local:
+   - crear un entorno virtual
    ```bash
-   poetry run python commands.py dev
+   python -m venv .venv
+   
+   ```
+   - iniciar el servicio
+  
+   ```bash
+   poetry run dev
    ```
 
 ## Endpoints Clave
